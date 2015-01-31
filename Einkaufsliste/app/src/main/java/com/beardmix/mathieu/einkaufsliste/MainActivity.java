@@ -15,6 +15,7 @@ public class MainActivity extends Activity
 {
     private static final int m_SCANNER_ACTIVITY_CODE = 10;
     ListView m_listView;
+    ListViewSwipe m_listViewSwipe;
     ImageButton m_addListElement_fab;
     ListContent m_listContent;
 
@@ -65,7 +66,10 @@ public class MainActivity extends Activity
 
     private void createFloatingActionButtonAdd()
     {
+        // get the button from the UI
         m_addListElement_fab = (ImageButton) findViewById(R.id.fab);
+
+        // define look
         ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider()
         {
             @Override
@@ -77,13 +81,14 @@ public class MainActivity extends Activity
             }
         };
         m_addListElement_fab.setOutlineProvider(viewOutlineProvider);
+
+        // Perform action on click
         m_addListElement_fab.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
-                // Perform action on click
                 Intent scanActIntent;
-                scanActIntent = new Intent(m_listView.getContext(), ScannerActivity.class);
+                scanActIntent = new Intent(m_listViewSwipe.getContext(), ScannerActivity.class);
                 scanActIntent.putExtra(ScannerActivity.m_INPUT_VALUE, "Salut Scanner!");
                 startActivityForResult(scanActIntent, m_SCANNER_ACTIVITY_CODE);
             }
@@ -93,64 +98,9 @@ public class MainActivity extends Activity
     private void createViewList()
     {
         // Get ListView object from xml
-        m_listView = (ListView) findViewById(R.id.list);
-
-        // Assign content adapter to ListView
-        //m_listView.setAdapter(m_listContent_as);
-        m_listView.setAdapter(m_listContent);
-
-        // ListView Item Click Listener
-        m_listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id)
-            {
-
-                // ListView Clicked item index
-                int itemPosition = position;
-
-                // ListView Clicked item value
-                String itemValue = (String) m_listView.getItemAtPosition(position);
-
-                // Show Alert
-                Toast.makeText(getApplicationContext(),
-                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
-                        .show();
-
-            }
-
-        });
-        // Create a ListView-specific touch listener. ListViews are given special treatment because
-        // by default they handle touches for their list items... i.e. they're in charge of drawing
-        // the pressed state (the list selector), handling list item clicks, etc.
-        SwipeDismissListViewTouchListener touchListener =
-                new SwipeDismissListViewTouchListener(
-                        m_listView,
-                        new SwipeDismissListViewTouchListener.DismissCallbacks()
-                        {
-                            @Override
-                            public boolean canDismiss(int position)
-                            {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismiss(ListView listView, int[] reverseSortedPositions)
-                            {
-                                for (int position : reverseSortedPositions)
-                                {
-                                    m_listContent.removeElementFromList(position);
-                                }
-                                //m_listContent_as.notifyDataSetChanged();
-                                m_listContent.notifyDataSetChanged();
-                            }
-                        });
-        m_listView.setOnTouchListener(touchListener);
-        // Setting this scroll listener is required to ensure that during ListView scrolling,
-        // we don't look for swipes.
-        m_listView.setOnScrollListener(touchListener.makeScrollListener());
+        m_listViewSwipe = (ListViewSwipe) findViewById(R.id.list);
+        m_listViewSwipe.create(m_listContent);
     }
+
 
 }
